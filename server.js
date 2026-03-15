@@ -4,13 +4,13 @@ const express = require('express');
 const http = require('http');
 const net = require('net');
 const httpProxy = require('http-proxy');
-const {handleHttpRequest , isBliocked} = require('./utils');
+const {handleHttpRequest , isBlocked} = require('./proxyhandler.js');
 
 const server = http.createServer(handleHttpRequest);
 
 server.on('Connect',(req , clientSocket, head) => {
     const [host , port] = req.url.split(':');
-    if(isBliocked(host)){
+    if(isBlocked(host)){
         clientSocket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
         clientSocket.end();
         return;
