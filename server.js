@@ -1,14 +1,20 @@
 //now here i will create a proxy server using express and http-proxy-middleware
 //its role will be to forward request to the proxy server which will further check website is blocked or not
-const express = require('express');
 const http = require('http');
 const net = require('net');
-const httpProxy = require('http-proxy');
 const {handleHttpRequest , isBlocked} = require('./proxyhandler.js');
 
 const server = http.createServer(handleHttpRequest);
+process.on("uncaughtException", (err) => {
+    console.log("Uncaught Exception:", err.message);
+});
 
-server.on('Connect',(req , clientSocket, head) => {
+process.on("unhandledRejection", (err) => {
+    console.log("Unhandled Rejection:", err);
+});
+
+server.on('connect',(req , clientSocket, head) => {
+    console.log("HTTPS REQUEST:", req.url);
     const [host , port] = req.url.split(':');
     if(isBlocked(host)){
         clientSocket.write('HTTP/1.1 403 Forbidden\r\n\r\n');
@@ -25,10 +31,12 @@ server.on('Connect',(req , clientSocket, head) => {
 
 
     })
-    server.listen(8080,()=>{
-    console.log('Proxy server is running on port 8080');
-    })
+   
 
 })
+ server.listen(8007,()=>{
+    console.log('Proxy server is running on port 8005');
+    })
+   
 
 // Handle HTTP requests
